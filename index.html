@@ -203,7 +203,7 @@
         dailyLogs.forEach(log => {
             let t = db.trainees.find(x => x.id == log.tId);
             if(t) {
-                let pLabel = log.period === 'صباحية' ? '☀️ صباحية' : '🌙 مسائية';
+                let pLabel = log.period === 'صباحية' ? 'صباحية' : ' مسائية';
                 tbody.innerHTML += `<tr>
                     <td><b>${t.name}</b></td>
                     <td>${pLabel}</td>
