@@ -421,32 +421,36 @@ container.innerHTML += `
 }
     function renderTable() {
     let d = document.getElementById('targetDate').value;
+    let p = document.querySelector('input[name="period"]:checked').value;
     let tbody = document.getElementById('logsTableBody');
-    if(!tbody) return; 
-
     tbody.innerHTML = '';
     
-    // فلترة السجلات حسب التاريخ المختار
-    let filteredLogs = db.logs.filter(x => x.date === d);
-
-    if(filteredLogs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="3">لا توجد سجلات لهذا التاريخ</td></tr>';
+    // فلترة السجلات بناءً على التاريخ المختار
+    // ملاحظة: إذا كنت تريد عرض كل الفترات (صباح ومساء) في الجدول معاً، 
+    // يمكنك إزالة "&& x.period === p" من الفلتر أدناه
+    let filtered = db.logs.filter(x => x.date === d && x.period === p);
+    
+    if(filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4">لا توجد تسجيلات لفترة ${p}</td></tr>`;
         return;
     }
 
-    filteredLogs.forEach(log => {
-        // نستخدم == بدلاً من === للتعامل مع اختلاف نوع البيانات (رقم/نص)
+    filtered.forEach(log => {
         let t = db.trainees.find(x => x.id == log.tId);
         if(t) {
             let sClass = log.status === 'حاضر' ? 'status-present' : 'status-absent';
-            tbody.innerHTML += `
-                <tr>
-                    <td>${t.name}</td>
-                    <td class="${sClass}">${log.status}</td>
-                    <td>
-                        <button class="edit-btn" onclick="toggleStatus(${log.tId}, '${log.date}')">تغيير</button>
-                    </td>
-                </tr>`;
+            let periodIcon = log.period === 'صباحية' ? '☀️' : '🌙';
+            
+            tbody.innerHTML += `<tr>
+                <td>${t.name}</td>
+                <td>${periodIcon} ${log.period}</td> <!-- عرض الفترة مع أيقونة -->
+                <td class="${sClass}">${log.status}</td>
+                <td>
+                    <button class="edit-btn" onclick="toggleStatus(${log.tId}, '${log.date}', '${log.period}')">
+                        تبديل
+                    </button>
+                </td>
+            </tr>`;
         }
     });
 }
