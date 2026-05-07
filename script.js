@@ -514,4 +514,17 @@ function importBackup(event) {
     };
     reader.readAsText(file);
 }
+    function logout() {
+    if(confirm("هل تريد تسجيل الخروج؟")) {
+        // إخفاء لوحة التطبيق وإظهار لوحة الدخول
+        document.getElementById('appPanel').style.display = 'none';
+        document.getElementById('loginPanel').style.display = 'block';
+        
+        // مسح كلمة المرور من الحقل لضمان الأمان
+        document.getElementById('sysPass').value = '';
+        
+        // اختيارياً: إعادة تحميل الصفحة لضمان تصفير كل المتغيرات المؤقتة
+        // location.reload(); 
+    }
+}
     document.getElementById('targetDate').addEventListener('change', refreshAll);
