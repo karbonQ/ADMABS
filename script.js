@@ -470,4 +470,48 @@ container.innerHTML += `
         alert("كلمة المرور خاطئة!"); 
     }
 }
+    // دالة البحث السريع عن متربص
+function searchTrainees() {
+    let term = document.getElementById('searchIn').value.toLowerCase();
+    let rows = document.querySelectorAll('#traineeUI .item-row');
+    rows.forEach(row => {
+        let name = row.querySelector('span').innerText.toLowerCase();
+        row.style.display = name.includes(term) ? 'flex' : 'none';
+    });
+}
+
+// دالة تصدير البيانات كملف JSON للكمبيوتر
+function exportBackup() {
+    let dataStr = JSON.stringify(db, null, 2);
+    let blob = new Blob([dataStr], { type: "application/json" });
+    let url = URL.createObjectURL(blob);
+    let link = document.createElement('a');
+    link.href = url;
+    link.download = `نسخة_احتياطية_غيابات_${new Date().toISOString().slice(0,10)}.json`;
+    link.click();
+}
+
+// دالة استيراد البيانات من ملف خارجي
+function importBackup(event) {
+    let file = event.target.files[0];
+    if (!file) return;
+    let reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            let importedData = JSON.parse(e.target.result);
+            if (importedData.specs && importedData.trainees) {
+                if(confirm("هل أنت متأكد؟ سيتم استبدال البيانات الحالية بالبيانات المستوردة.")) {
+                    db = importedData;
+                    save();
+                    location.reload(); // إعادة تحميل لتنشيط البيانات الجديدة
+                }
+            } else {
+                alert("الملف غير صحيح!");
+            }
+        } catch (err) {
+            alert("حدث خطأ في قراءة الملف!");
+        }
+    };
+    reader.readAsText(file);
+}
     document.getElementById('targetDate').addEventListener('change', refreshAll);
