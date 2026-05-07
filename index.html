@@ -345,16 +345,15 @@ db.logs.forEach(log => {
     }
     function clearHistory() { if(confirm("مسح سجل اليوم؟")) { db.logs = db.logs.filter(x => x.date !== document.getElementById('targetDate').value); save(); refreshAll(); } }
 
-  async function makeWord(id) {
+ async function makeWord(id) {
     try {
         const t = db.trainees.find(x => x.id == id);
         if (!window.docx) {
-            alert("خطأ: لم يتم تحميل مكتبة الوورد. تأكد من اتصالك بالإنترنت.");
+            alert("خطأ: لم يتم تحميل مكتبة الوورد.");
             return;
         }
 
-        // استخراج تواريخ الغيابات وتنسيقها
-        // سنقوم بجمع التواريخ التي غاب فيها سواء في الصباح أو المساء
+        // استخراج وتنسيق تواريخ الغيابات
         const absenceDates = db.logs
             .filter(log => log.tId == id && (log.AM === 'غائب' || log.PM === 'غائب'))
             .map(log => {
@@ -373,39 +372,53 @@ db.logs.forEach(log => {
                     page: { margin: { top: 720, right: 720, bottom: 720, left: 720 } },
                 },
                 children: [
+                    // العنوان الرئيسي
                     new Paragraph({
                         alignment: AlignmentType.CENTER,
-                        children: [new TextRun({ text: "الجمهورية الجزائرية الديمقراطية الشعبية", bold: true, size: 28, font: "Cairo" })]
+                        children: [
+                            new TextRun({ text: "الجمهورية الجزائرية الديمقراطية الشعبية", bold: true, size: 28, rightToLeft: true })
+                        ],
                     }),
                     new Paragraph({
                         alignment: AlignmentType.CENTER,
-                        children: [new TextRun({ text: "مركز التكوين والتمهين الشهيد أحمد زبانة - السوقر 01", size: 24, font: "Cairo" })]
+                        children: [
+                            new TextRun({ text: "مركز التكوين والتمهين الشهيد أحمد زبانة - السوقر 01", size: 24, rightToLeft: true })
+                        ],
                     }),
                     new Paragraph({
                         alignment: AlignmentType.CENTER,
                         spacing: { before: 500, after: 500 },
-                        children: [new TextRun({ text: "إشعار بوضعية غيابات", bold: true, size: 40, underline: {}, font: "Cairo" })]
+                        children: [
+                            new TextRun({ text: "إشعار بوضعية غيابات", bold: true, size: 40, underline: {}, rightToLeft: true })
+                        ],
+                    }),
+
+                    // نص الرسالة
+                    new Paragraph({
+                        alignment: AlignmentType.RIGHT,
+                        bidirectional: true, // تفعيل الاتجاه الثنائي للفقرة
+                        children: [
+                            new TextRun({ text: "إلى ولي أمر المتربص(ة): ", bold: true, size: 28, rightToLeft: true }), 
+                            new TextRun({ text: t.name, size: 28, color: "2c3e50", rightToLeft: true })
+                        ],
                     }),
                     new Paragraph({
                         alignment: AlignmentType.RIGHT,
                         bidirectional: true,
-                        children: [new TextRun({ text: "إلى ولي أمر المتربص(ة): ", bold: true, size: 28, font: "Cairo" }), 
-                                   new TextRun({ text: t.name, size: 28, font: "Cairo", color: "2c3e50" })]
-                    }),
-                    new Paragraph({
-                        alignment: AlignmentType.RIGHT,
-                        bidirectional: true,
-                        spacing: { before: 200 },
-                        children: [new TextRun({ text: "نحيطكم علماً أن المتربص قد سجل غيابات في التواريخ التالية:", size: 26, font: "Cairo" })]
+                        spacing: { before: 200, after: 200 },
+                        children: [
+                            new TextRun({ text: "نحيطكم علماً أن المتربص قد سجل غيابات في التواريخ التالية:", size: 26, rightToLeft: true })
+                        ],
                     }),
                     
-                    // إضافة التواريخ كنقاط
+                    // قائمة التواريخ
                     ...absenceDates.map(dateStr => 
                         new Paragraph({
                             alignment: AlignmentType.RIGHT,
                             bidirectional: true,
-                            bullet: { level: 0 },
-                            children: [new TextRun({ text: dateStr, size: 24, font: "Cairo" })]
+                            children: [
+                                new TextRun({ text: "• " + dateStr, size: 24, rightToLeft: true })
+                            ]
                         })
                     ),
 
@@ -413,12 +426,18 @@ db.logs.forEach(log => {
                         alignment: AlignmentType.RIGHT,
                         bidirectional: true,
                         spacing: { before: 400 },
-                        children: [new TextRun({ text: "نرجو منكم الحضور لتبرير هذه الغيابات في أقرب وقت.", size: 24, font: "Cairo", italic: true })]
+                        children: [
+                            new TextRun({ text: "نرجو منكم الحضور لتبرير هذه الغيابات في أقرب وقت لتفادي الإقصاء.", size: 24, italic: true, rightToLeft: true })
+                        ],
                     }),
+
+                    // التوقيع
                     new Paragraph({
                         alignment: AlignmentType.LEFT,
-                        spacing: { before: 600 },
-                        children: [new TextRun({ text: "ختم مصلحة الرقابة العامة", bold: true, size: 24, font: "Cairo" })]
+                        spacing: { before: 800 },
+                        children: [
+                            new TextRun({ text: "ختم مصلحة الرقابة العامة", bold: true, size: 26, rightToLeft: true })
+                        ],
                     })
                 ],
             }],
@@ -429,7 +448,7 @@ db.logs.forEach(log => {
         
     } catch (error) {
         console.error(error);
-        alert("حدث خطأ أثناء إنشاء ملف الوورد.");
+        alert("حدث خطأ تقني. يرجى تجربة متصفح Google Chrome.");
     }
 }
 </script>
