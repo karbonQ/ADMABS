@@ -327,7 +327,7 @@ db.logs.forEach(log => {
                     <span>${t.name} (${counts[id]} غيابات)</span>
                     <div class="admin-controls">
                         <a class="wa-btn" href="https://wa.me/${t.phone}?text=${encodedMsg}" target="_blank">واتساب</a>
-                        <button class="word-btn" onclick="makeWord(${id})">وورد</button>
+                        <button class="word-btn"onclick="makeWord(${id}, ${counts[id]})">وورد</button>
                     </div></div>`;
             }
         }
