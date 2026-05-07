@@ -63,6 +63,7 @@
                 <div id="specUI" class="item-list"></div>
             </div>
             <div class="card flex-1">
+                <input type="text" id="searchIn" class="search-box" placeholder="ابحث عن اسم متربص..." onkeyup="searchTrainees()">
                 <h2>👥 المتربصين</h2>
                 <select id="specFilter" onchange="renderTrainees()"></select>
                 <input type="text" id="traineeNameIn" placeholder="اسم المتربص">
@@ -274,6 +275,14 @@
     // مسح التاريخ وحفظ البيانات
     function clearHistory() { let d = document.getElementById('targetDate').value; if(confirm(`مسح سجلات ${d}؟`)) { db.logs = db.logs.filter(x => x.date !== d); save(); refreshAll(); } }
     function save() { localStorage.setItem('abs_final_stable', JSON.stringify(db)); }
+    <div class="card">
+    <h2>💾 إدارة البيانات (نسخة احتياطية)</h2>
+    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+        <button class="btn-backup" onclick="exportBackup()">📥 تصدير قاعدة البيانات</button>
+        <button class="btn-backup" style="background:#2c3e50" onclick="document.getElementById('importFile').click()">📤 استيراد قاعدة البيانات</button>
+        <input type="file" id="importFile" style="display:none" accept=".json" onchange="importBackup(event)">
+    </div>
+</div>
 
     // تصدير Word (كما هو في كودك)
     async function makeWord(id) {
