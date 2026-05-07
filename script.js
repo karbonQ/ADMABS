@@ -514,17 +514,17 @@ function importBackup(event) {
     };
     reader.readAsText(file);
 }
-    function logout() {
-    if(confirm("هل تريد تسجيل الخروج؟")) {
-        // إخفاء لوحة التطبيق وإظهار لوحة الدخول
+    document.getElementById('logoutBtn').addEventListener('click', function() {
+    if(confirm("هل أنت متأكد من تسجيل الخروج؟")) {
+        // إخفاء الواجهة الرئيسية
         document.getElementById('appPanel').style.display = 'none';
+        // إظهار واجهة الدخول
         document.getElementById('loginPanel').style.display = 'block';
-        
-        // مسح كلمة المرور من الحقل لضمان الأمان
+        // تصفير حقل كلمة المرور للأمان
         document.getElementById('sysPass').value = '';
         
-        // اختيارياً: إعادة تحميل الصفحة لضمان تصفير كل المتغيرات المؤقتة
-        // location.reload(); 
+        // رسالة تنبيه اختيارية
+        console.log("تم تسجيل الخروج بنجاح");
     }
-}
+});
     document.getElementById('targetDate').addEventListener('change', refreshAll);
