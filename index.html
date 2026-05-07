@@ -345,31 +345,88 @@ db.logs.forEach(log => {
     }
     function clearHistory() { if(confirm("مسح سجل اليوم؟")) { db.logs = db.logs.filter(x => x.date !== document.getElementById('targetDate').value); save(); refreshAll(); } }
 
-    async function makeWord(id, count) {
+  async function makeWord(id) {
     try {
         const t = db.trainees.find(x => x.id == id);
         if (!window.docx) {
             alert("خطأ: لم يتم تحميل مكتبة الوورد. تأكد من اتصالك بالإنترنت.");
             return;
         }
+
+        // استخراج تواريخ الغيابات وتنسيقها
+        // سنقوم بجمع التواريخ التي غاب فيها سواء في الصباح أو المساء
+        const absenceDates = db.logs
+            .filter(log => log.tId == id && (log.AM === 'غائب' || log.PM === 'غائب'))
+            .map(log => {
+                let period = "";
+                if(log.AM === 'غائب' && log.PM === 'غائب') period = "(يوم كامل)";
+                else if(log.AM === 'غائب') period = "(صباحاً)";
+                else if(log.PM === 'غائب') period = "(مساءً)";
+                return `${log.date} ${period}`;
+            });
+
         const { Document, Packer, Paragraph, TextRun, AlignmentType } = window.docx;
+
         const doc = new Document({
-            sections: [{ 
-                properties: {},
+            sections: [{
+                properties: {
+                    page: { margin: { top: 720, right: 720, bottom: 720, left: 720 } },
+                },
                 children: [
-                    new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "الجمهورية الجزائرية الديمقراطية الشعبية", bold: true, size: 28 })] }),
-                    new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: "مركز التكوين و التمهين الشهيد أحمد زبانة السوقر", size: 24 })] }),
-                    new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 400, after: 400 }, children: [new TextRun({ text: "إشعار بغياب غير نظامي", bold: true, size: 40, underline: {} })] }),
-                    new Paragraph({ alignment: AlignmentType.left, bidirectional: true, spacing: { before: 200 }, children: [new TextRun({ text: "يؤسفنا بأن نعلمكم بأن المتربص(ة): " + t.name, bold: true, size: 30 })] }),
-                    new Paragraph({ alignment: AlignmentType.left, bidirectional: true, children: [new TextRun({ text: "بأنه قد سجل " + count + " فترات غياب غير مبررة.", size: 28 })] }),
-                    new Paragraph({ alignment: AlignmentType.left, bidirectional: true, children: [new TextRun({ text: "و عليه يرجى اتخاذ الاجراءات الإدارية المناسبة .", size: 28 })] }),
-                    new Paragraph({ alignment: AlignmentType.LEFT, spacing: { before: 500 }, children: [new TextRun({ text: "إمضاء الأستاذ", bold: true, size: 24,underline :{}})] })
-                ]
-            }]
+                    new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        children: [new TextRun({ text: "الجمهورية الجزائرية الديمقراطية الشعبية", bold: true, size: 28, font: "Cairo" })]
+                    }),
+                    new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        children: [new TextRun({ text: "مركز التكوين والتمهين الشهيد أحمد زبانة - السوقر 01", size: 24, font: "Cairo" })]
+                    }),
+                    new Paragraph({
+                        alignment: AlignmentType.CENTER,
+                        spacing: { before: 500, after: 500 },
+                        children: [new TextRun({ text: "إشعار بوضعية غيابات", bold: true, size: 40, underline: {}, font: "Cairo" })]
+                    }),
+                    new Paragraph({
+                        alignment: AlignmentType.RIGHT,
+                        bidirectional: true,
+                        children: [new TextRun({ text: "إلى ولي أمر المتربص(ة): ", bold: true, size: 28, font: "Cairo" }), 
+                                   new TextRun({ text: t.name, size: 28, font: "Cairo", color: "2c3e50" })]
+                    }),
+                    new Paragraph({
+                        alignment: AlignmentType.RIGHT,
+                        bidirectional: true,
+                        spacing: { before: 200 },
+                        children: [new TextRun({ text: "نحيطكم علماً أن المتربص قد سجل غيابات في التواريخ التالية:", size: 26, font: "Cairo" })]
+                    }),
+                    
+                    // إضافة التواريخ كنقاط
+                    ...absenceDates.map(dateStr => 
+                        new Paragraph({
+                            alignment: AlignmentType.RIGHT,
+                            bidirectional: true,
+                            bullet: { level: 0 },
+                            children: [new TextRun({ text: dateStr, size: 24, font: "Cairo" })]
+                        })
+                    ),
+
+                    new Paragraph({
+                        alignment: AlignmentType.RIGHT,
+                        bidirectional: true,
+                        spacing: { before: 400 },
+                        children: [new TextRun({ text: "نرجو منكم الحضور لتبرير هذه الغيابات في أقرب وقت.", size: 24, font: "Cairo", italic: true })]
+                    }),
+                    new Paragraph({
+                        alignment: AlignmentType.LEFT,
+                        spacing: { before: 600 },
+                        children: [new TextRun({ text: "ختم مصلحة الرقابة العامة", bold: true, size: 24, font: "Cairo" })]
+                    })
+                ],
+            }],
         });
 
         const blob = await Packer.toBlob(doc);
         saveAs(blob, `استدعاء_${t.name}.docx`);
+        
     } catch (error) {
         console.error(error);
         alert("حدث خطأ أثناء إنشاء ملف الوورد.");
