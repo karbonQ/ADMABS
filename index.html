@@ -389,32 +389,32 @@ db.logs.forEach(log => {
                         alignment: AlignmentType.CENTER,
                         spacing: { before: 500, after: 500 },
                         children: [
-                            new TextRun({ text: "إشعار بوضعية غيابات", bold: true, size: 40, underline: {}, rightToLeft: true })
+                            new TextRun({ text: "إشعار بغياب غير نظامي ", bold: true, size: 28, underline: {}, rightToLeft: true })
                         ],
                     }),
 
                     // نص الرسالة
                     new Paragraph({
-                        alignment: AlignmentType.RIGHT,
+                        alignment: AlignmentType.left,
                         bidirectional: true, // تفعيل الاتجاه الثنائي للفقرة
                         children: [
-                            new TextRun({ text: "إلى ولي أمر المتربص(ة): ", bold: true, size: 28, rightToLeft: true }), 
+                            new TextRun({ text: "يؤسفنا أن نعلمكم بأن المتربص(ة): ", size: 28, rightToLeft: true }), 
                             new TextRun({ text: t.name, size: 28, color: "2c3e50", rightToLeft: true })
                         ],
                     }),
                     new Paragraph({
-                        alignment: AlignmentType.RIGHT,
+                        alignment: AlignmentType.left,
                         bidirectional: true,
                         spacing: { before: 200, after: 200 },
                         children: [
-                            new TextRun({ text: "نحيطكم علماً أن المتربص قد سجل غيابات في التواريخ التالية:", size: 26, rightToLeft: true })
+                            new TextRun({ text: "قد سجل غيابات في التواريخ التالية:", size: 26, rightToLeft: true })
                         ],
                     }),
                     
                     // قائمة التواريخ
                     ...absenceDates.map(dateStr => 
                         new Paragraph({
-                            alignment: AlignmentType.RIGHT,
+                            alignment: AlignmentType.left,
                             bidirectional: true,
                             children: [
                                 new TextRun({ text: "• " + dateStr, size: 24, rightToLeft: true })
@@ -423,20 +423,20 @@ db.logs.forEach(log => {
                     ),
 
                     new Paragraph({
-                        alignment: AlignmentType.RIGHT,
+                        alignment: AlignmentType.left,
                         bidirectional: true,
                         spacing: { before: 400 },
                         children: [
-                            new TextRun({ text: "نرجو منكم الحضور لتبرير هذه الغيابات في أقرب وقت لتفادي الإقصاء.", size: 24, italic: true, rightToLeft: true })
+                            new TextRun({ text: "و لهذا يرجي منكم إتخاذ الإجراءات الإدارية المناسبة .", size: 24, italic: true, rightToLeft: true })
                         ],
                     }),
 
                     // التوقيع
                     new Paragraph({
-                        alignment: AlignmentType.LEFT,
+                        alignment: AlignmentType.right,
                         spacing: { before: 800 },
                         children: [
-                            new TextRun({ text: "ختم مصلحة الرقابة العامة", bold: true, size: 26, rightToLeft: true })
+                            new TextRun({ text: "إمضاء الأستــــاذ", bold: true, size: 26, rightToLeft: true })
                         ],
                     })
                 ],
