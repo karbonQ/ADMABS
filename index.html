@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <title>نظام إدارة الغيابات - فترتين</title>
+    <title> إدارة الغيابات </title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -44,7 +44,7 @@
 <body>
 <div class="container">
     <div id="loginPanel" class="card" style="max-width: 400px; margin: 50px auto;">
-        <h2>دخول النظام</h2>
+        <h2>دخول </h2>
         <input type="password" id="sysPass" placeholder="كلمة المرور">
         <button class="btn-main" onclick="doLogin()">دخول</button>
     </div>
@@ -53,28 +53,28 @@
         <div class="card" style="text-align: center; border-bottom: 3px solid var(--primary);">
             <h3 style="margin: 0;">الجمهورية الجزائرية الديمقراطية الشعبية</h3>
             <h3 style="margin: 5px 0; color: var(--primary);">مركز التكوين و التمهين الشهيد أحمد زبانة السوقر1</h3>
-            <p style="margin: 5px 0; font-size: 0.9rem; color: #666;">برنامج إدارة الغيابات (صباحي/مسائي) - تصميم: د. الهواري بومدين</p>
+            <p style="margin: 5px 0; font-size: 0.9rem; color: #666;">برنامج إدارة الغيابات - تصميم الأستاذ: دومة الهواري بومدين</p>
         </div>
 
         <div class="flex-group">
             <div class="card flex-1">
-                <h2>📁 التخصصات والمتربصين</h2>
+                <h2> التخصصات/المتربصين</h2>
                 <div style="display:flex; gap:5px;">
-                    <input type="text" id="specNameIn" placeholder="تخصص جديد...">
+                    <input type="text" id="specNameIn" placeholder="إضافة تخصص جديد...">
                     <button class="btn-main" style="width:80px" onclick="addSpec()">إضافة</button>
                 </div>
                 <div id="specUI" class="item-list" style="margin-bottom:10px;"></div>
                 
                 <select id="specFilter" onchange="renderTrainees()"></select>
-                <input type="text" id="traineeNameIn" placeholder="اسم المتربص">
-                <input type="text" id="traineePhoneIn" placeholder="الهاتف">
-                <button class="btn-save" onclick="addTrainee()">حفظ متربص</button>
+                <input type="text" id="traineeNameIn" placeholder=" إضافة متربص جديد...">
+                <input type="text" id="traineePhoneIn" placeholder=" رقم هاتف ولى الأمر">
+                <button class="btn-save" onclick="addTrainee()">حفظ </button>
                 <input type="text" id="searchIn" class="search-box" placeholder="بحث عن متربص..." onkeyup="searchTrainees()">
                 <div id="traineeUI" class="item-list"></div>
             </div>
 
             <div class="card flex-1">
-                <h2>📅 تسجيل الحضور اليومي</h2>
+                <h2> تسجيل الحضور اليومي</h2>
                 <input type="date" id="targetDate" onchange="refreshAll()">
                 <select id="traineeSelect"></select>
                 <hr>
@@ -95,7 +95,7 @@
         </div>
 
         <div class="card" style="border-right: 5px solid var(--report);">
-            <h2>📊 التقرير الشهري الإجمالي</h2>
+            <h2> التقرير الشهري الإجمالي</h2>
             <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 10px;">
                 <input type="month" id="reportMonth" style="flex: 1;">
                 <button class="btn-report" style="flex: 1; padding: 10px;" onclick="generateMonthlyReport()">عرض التقرير</button>
@@ -119,27 +119,27 @@
         </div>
 
         <div class="card">
-            <h2>📝 سجلات اليوم المختصرة</h2>
+            <h2> سجلات اليوم المختصرة</h2>
             <div class="table-container">
                 <table>
                     <thead>
                         <tr>
                             <th>المتربص</th>
-                            <th>صباحاً</th>
-                            <th>مساءً</th>
+                            <th>الفترة الصباحية</th>
+                            <th>الفترة المسائية</th>
                         </tr>
                     </thead>
                     <tbody id="logsTableBody"></tbody>
                 </table>
             </div>
             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                <button class="btn-excel" onclick="exportToExcel()">حفظ سجل اليوم (Excel)</button>
+                <button class="btn-excel" onclick="exportToExcel()">حفظ سجل اليوم </button>
                 <button style="background:#7f8c8d; color:white; margin-top:10px; width:auto; padding:8px 15px; border:none; border-radius:8px; cursor:pointer;" onclick="clearHistory()">🗑️ مسح سجل اليوم </button>
             </div>
         </div>
 
         <div class="card">
-            <h2>⚠️ الاستدعاءات (3 فترات غياب فأكثر)</h2>
+            <h2>⚠️ الاستدعاءات (>3 فترات غياب)</h2>
             <div id="alertUI"></div>
         </div>
 
@@ -147,7 +147,7 @@
             <h2>💾 قاعدة البيانات</h2>
             <div style="display: flex; gap: 10px;">
                 <button class="btn-backup" onclick="exportBackup()">📥 تصدير نسخة</button>
-                <button class="btn-backup" style="background:#2c3e50" onclick="document.getElementById('importFile').click()">📤 استيراد نسخة</button>
+                <button class="btn-backup" style="background:#7f8c8d" onclick="document.getElementById('importFile').click()">📤 استيراد نسخة</button>
                 <input type="file" id="importFile" style="display:none" onchange="importBackup(event)">
             </div>
         </div>
