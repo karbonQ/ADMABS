@@ -65,19 +65,16 @@
             <button onclick="showLogin()" style="background:none; border:none; color:var(--danger); cursor:pointer; margin-top:15px; width:100%; font-weight:bold;">❌ إلغاء</button>
         </div>
     </div>
-    
     <!-- لوحة التطبيق الرئيسية -->
     <div id="appPanel" style="display:none;">
         <div style="display: flex; justify-content: flex-end; padding: 10px;">
             <button onclick="window.location.reload()" style="width: auto; background: #c0392b; color: white; padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">🚪 خروج</button>
         </div>
-
         <div class="card" style="text-align: center; border-bottom: 3px solid var(--primary);">
             <h3 style="margin: 0;">الجمهورية الجزائرية الديمقراطية الشعبية</h3>
             <h3 style="margin: 5px 0; color: var(--primary);">مركز التكوين و التمهين الشهيد أحمد زبانة السوقر 01</h3>
             <p style="margin: 5px 0; font-size: 0.9rem; color: #666;">نظام الإدارة الرقمي للغيابات - الأستاذ: <span id="currentProfName"></span></p>
         </div>
-
         <div class="flex-group">
             <div class="card flex-1">
                 <h2>📁 التخصصات والمتربصين</h2>
@@ -86,14 +83,12 @@
                     <button class="btn-main" style="width:80px" onclick="addSpec()">إضافة</button>
                 </div>
                 <div id="specUI" class="item-list" style="margin-bottom:10px;"></div>
-                
                 <select id="specFilter" onchange="renderTrainees()"></select>
                 <input type="text" id="traineeNameIn" placeholder="اسم المتربص">
                 <input type="text" id="traineePhoneIn" placeholder="هاتف ولي الأمر">
                 <button class="btn-save" onclick="addTrainee()">حفظ متربص</button>
                 <div id="traineeUI" class="item-list"></div>
             </div>
-
             <div class="card flex-1">
                 <h2>📅 تسجيل الحضور (فترتين)</h2>
                 <input type="date" id="targetDate" onchange="refreshAll()">
@@ -177,15 +172,68 @@
         let n = document.getElementById('specNameIn').value.trim();
         if(n) { db.specs.push({ id: Date.now(), name: n }); save(); renderSpecs(); document.getElementById('specNameIn').value = ''; }
     }
-    function renderSpecs() {
-        let ui = document.getElementById('specUI'), filter = document.getElementById('specFilter');
-        ui.innerHTML = ''; filter.innerHTML = '';
-        db.specs.forEach(s => {
-            ui.innerHTML += `<div class="item-row"><span>${s.name}</span><button class="btn-danger" style="width:40px" onclick="delSpec(${s.id})">✕</button></div>`;
-            filter.innerHTML += `<option value="${s.id}">${s.name}</option>`;
-        });
-        renderTrainees();
+  // 1. تحديث عرض التخصصات لإضافة زر التعديل
+// 1. تحديث عرض التخصصات لإضافة زر التعديل
+function renderSpecs() {
+    let ui = document.getElementById('specUI'), filter = document.getElementById('specFilter');
+    ui.innerHTML = ''; filter.innerHTML = '';
+    db.specs.forEach(s => {
+        ui.innerHTML += `
+            <div class="item-row">
+                <span>${s.name}</span>
+                <div style="display:flex; gap:5px;">
+                    <button class="btn-main" style="width:40px; background:var(--edit);" onclick="editSpec(${s.id}, '${s.name}')">✎</button>
+                    <button class="btn-danger" style="width:40px" onclick="delSpec(${s.id})">✕</button>
+                </div>
+            </div>`;
+        filter.innerHTML += `<option value="${s.id}">${s.name}</option>`;
+    });
+    renderTrainees();
+}
+
+// 2. تحديث عرض المتربصين لإضافة زر التعديل
+function renderTrainees() {
+    let sId = document.getElementById('specFilter').value, ui = document.getElementById('traineeUI'), sel = document.getElementById('traineeSelect');
+    ui.innerHTML = ''; sel.innerHTML = '';
+    db.trainees.filter(t => t.specId == sId).forEach(t => {
+        ui.innerHTML += `
+            <div class="item-row">
+                <span>${t.name}</span>
+                <div style="display:flex; gap:5px;">
+                    <button class="btn-main" style="width:40px; background:var(--edit);" onclick="editTrainee(${t.id}, '${t.name}', '${t.phone}')">✎</button>
+                    <button class="btn-danger" style="width:40px" onclick="delTrainee(${t.id})">✕</button>
+                </div>
+            </div>`;
+        sel.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+    });
+}
+
+// 3. دوال منطق التعديل الجديدة
+function editSpec(id, oldName) {
+    let newName = prompt("تعديل اسم التخصص:", oldName);
+    if (newName && newName.trim() !== "") {
+        let spec = db.specs.find(x => x.id == id);
+        if (spec) {
+            spec.name = newName.trim();
+            save();
+            renderSpecs();
+        }
     }
+}
+
+function editTrainee(id, oldName, oldPhone) {
+    let newName = prompt("تعديل اسم المتربص:", oldName);
+    let newPhone = prompt("تعديل رقم الهاتف:", oldPhone);
+    if (newName && newName.trim() !== "") {
+        let trainee = db.trainees.find(x => x.id == id);
+        if (trainee) {
+            trainee.name = newName.trim();
+            trainee.phone = newPhone.trim();
+            save();
+            renderTrainees();
+        }
+    }
+}
     function delSpec(id) { if(confirm("حذف التخصص؟")) { db.specs = db.specs.filter(x => x.id != id); save(); renderSpecs(); } }
 
     function addTrainee() {
