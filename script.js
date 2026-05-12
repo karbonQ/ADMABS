@@ -454,22 +454,73 @@ container.innerHTML += `
         }
     });
 }
-    function doLogin() {
-    if(document.getElementById('sysPass').value === '1234') {
+
+// إضافة مصفوفة المستخدمين في قاعدة البيانات إذا لم تكن موجودة
+if (!db.users) {
+    db.users = [{ name: "admin", pass: "1234" }]; // مستخدم افتراضي
+    save();
+}
+
+function showRegister() {
+    document.getElementById('loginView').style.display = 'none';
+    document.getElementById('registerView').style.display = 'block';
+}
+
+function showLogin() {
+    document.getElementById('registerView').style.display = 'none';
+    document.getElementById('loginView').style.display = 'block';
+}
+
+function handleRegister() {
+    let name = document.getElementById('regName').value.trim();
+    let pass = document.getElementById('regPass').value;
+    let confirm = document.getElementById('regPassConfirm').value;
+
+    if (!name || !pass) { alert("يرجى ملء جميع الحقول"); return; }
+    if (pass !== confirm) { alert("كلمات السر غير متطابقة"); return; }
+    
+    // التأكد من عدم تكرار الاسم
+    if (db.users.find(u => u.name === name)) {
+        alert("هذا المستخدم مسجل مسبقاً");
+        return;
+    }
+
+    db.users.push({ name: name, pass: pass });
+    save();
+    alert("تم إنشاء الحساب بنجاح! يمكنك الآن الدخول.");
+    showLogin();
+}
+
+function handleLogin() {
+    let name = document.getElementById('userName').value.trim();
+    let pass = document.getElementById('userPass').value;
+
+    let user = db.users.find(u => u.name === name && u.pass === pass);
+
+    if (user) {
+        // إذا كان الدخول صحيحاً
         document.getElementById('loginPanel').style.display = 'none';
         document.getElementById('appPanel').style.display = 'block';
         
-        // تعيين تاريخ اليوم تلقائياً عند الدخول
-        if(!document.getElementById('targetDate').value) {
-            document.getElementById('targetDate').valueAsDate = new Date();
-        }
+        // عرض اسم الأستاذ في الترويسة لزيادة الاحترافية
+        console.log("مرحباً بالأستاذ " + user.name);
         
-        renderSpecs(); 
-        refreshAll(); // هذا السطر هو المسؤول عن إظهار السجل فور الدخول
-    } else { 
-        alert("كلمة المرور خاطئة!"); 
+        // إعدادات افتراضية عند الدخول
+        document.getElementById('targetDate').valueAsDate = new Date();
+        document.getElementById('reportMonth').value = new Date().toISOString().slice(0, 7);
+        renderSpecs(); refreshAll();
+    } else {
+        alert("اسم المستخدم أو كلمة السر خاطئة!");
     }
 }
+
+function forgotPass() {
+    alert("لدواعي أمنية، يرجى التواصل مع مسؤول النظام (أو الأستاذ دومة) لإعادة تعيين كلمة السر الخاصة بك من خلال قاعدة البيانات.");
+}
+
+
+
+    
     // دالة البحث السريع عن متربص
 function searchTrainees() {
     let term = document.getElementById('searchIn').value.toLowerCase();
