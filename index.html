@@ -193,47 +193,52 @@ function renderSpecs() {
 
 // 2. تحديث عرض المتربصين لإضافة زر التعديل
 function renderTrainees() {
-    let sId = document.getElementById('specFilter').value, 
-        ui = document.getElementById('traineeUI'), 
-        sel = document.getElementById('traineeSelect');
+    let sId = document.getElementById('specFilter').value;
+    let ui = document.getElementById('traineeUI');
+    let sel = document.getElementById('traineeSelect');
     
     ui.innerHTML = ''; 
     sel.innerHTML = '';
     
+    // فلترة المتربصين حسب التخصص المختار
     db.trainees.filter(t => t.specId == sId).forEach(t => {
-        // إضافة الأزرار داخل حاوية flex لضمان التنسيق
+        // إنشاء السطر مع زر التعديل وزر الحذف
         ui.innerHTML += `
             <div class="item-row">
                 <span>${t.name}</span>
-                <div style="display:flex; gap:5px;">
-                    <!-- زر التعديل الجديد -->
-                    <button class="btn-main" style="width:40px; background:var(--edit); margin:0;" onclick="editTrainee(${t.id}, '${t.name}', '${t.phone}')">✎</button>
-                    <!-- زر الحذف -->
-                    <button class="btn-danger" style="width:40px; margin:0;" onclick="delTrainee(${t.id})">✕</button>
+                <div style="display:flex; gap:5px; align-items:center;">
+                    <!-- زر التعديل (أيقونة القلم) -->
+                    <button class="btn-main" style="width:35px; height:30px; background:var(--edit); padding:0; display:flex; justify-content:center; align-items:center;" 
+                        onclick="editTrainee(${t.id}, '${t.name}', '${t.phone}')">✎</button>
+                    
+                    <!-- زر الحذف (أيقونة X) -->
+                    <button class="btn-danger" style="width:35px; height:30px; padding:0; display:flex; justify-content:center; align-items:center;" 
+                        onclick="delTrainee(${t.id})">✕</button>
                 </div>
             </div>`;
+            
+        // إضافة المتربص لقائمة اختيار الحضور والغياب
         sel.innerHTML += `<option value="${t.id}">${t.name}</option>`;
     });
 }
+
+// دالة التعديل (يجب أن تكون موجودة في السكريبت)
 function editTrainee(id, oldName, oldPhone) {
     let newName = prompt("تعديل اسم المتربص:", oldName);
-    if (newName === null) return; // إلغاء إذا ضغط المستخدم على Cancel
-    
+    if (newName === null) return; 
+
     let newPhone = prompt("تعديل رقم هاتف ولي الأمر:", oldPhone);
     if (newPhone === null) return;
 
     if (newName.trim() !== "") {
-        let trainee = db.trainees.find(x => x.id == id);
-        if (trainee) {
-            trainee.name = newName.trim();
-            trainee.phone = newPhone.trim();
-            save(); // حفظ في localStorage
+        let index = db.trainees.findIndex(x => x.id == id);
+        if (index !== -1) {
+            db.trainees[index].name = newName.trim();
+            db.trainees[index].phone = newPhone.trim();
+            save(); // حفظ التغييرات في localStorage
             renderTrainees(); // تحديث القائمة فوراً
-            refreshAll(); // تحديث الإحصائيات والرسائل إذا لزم الأمر
-            alert("تم تحديث بيانات المتربص بنجاح");
+            alert("تم التحديث بنجاح");
         }
-    } else {
-        alert("لا يمكن ترك الاسم فارغاً");
     }
 }
 
