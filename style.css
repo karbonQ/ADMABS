@@ -1,3 +1,6 @@
+:root { --edit: #f39c12; } /* هذا هو المتغير المسؤول عن لون زر التعديل */
+
+
 body { 
     font-family: 'Cairo', sans-serif; /* تغيير الخط هنا */
     background: var(--bg); 
