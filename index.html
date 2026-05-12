@@ -107,7 +107,10 @@
                         <button class="btn-danger" onclick="record('PM', 'غائب')">❌ غائب</button>
                     </div>
                 </div>
-                <div id="chartArea" style="margin-top:15px;"><canvas id="dailyChart" height="150"></canvas></div>
+               <!-- تحديد عرض أقصى 300px وتوسيط الرسم -->
+<div id="chartArea" style="margin-top:15px; max-width: 350px; margin-left: auto; margin-right: auto;">
+    <canvas id="dailyChart"></canvas>
+</div>
             </div>
         </div>
 
@@ -247,19 +250,73 @@
     function refreshAll() { updateChart(); renderAlerts(); }
 
     function updateChart() {
-        let d = document.getElementById('targetDate').value, logs = db.logs.filter(x => x.date === d);
+    // جلب آخر 5 أيام تم تسجيل بيانات فيها لعرضها على المنحنى
+    let allDates = [...new Set(db.logs.map(l => l.date))].sort().slice(-5);
+    if(allDates.length === 0) allDates = [document.getElementById('targetDate').value];
+
+    let presentData = [];
+    let absentData = [];
+
+    allDates.forEach(d => {
+        let dayLogs = db.logs.filter(x => x.date === d);
         let p = 0, ab = 0;
-        logs.forEach(l => {
+        dayLogs.forEach(l => {
             if(l.AM === 'حاضر') p++; if(l.AM === 'غائب') ab++;
             if(l.PM === 'حاضر') p++; if(l.PM === 'غائب') ab++;
         });
-        let ctx = document.getElementById('dailyChart').getContext('2d');
-        if(chartObj) chartObj.destroy();
-        chartObj = new Chart(ctx, {
-            type: 'doughnut',
-            data: { labels: ['حضور', 'غياب'], datasets: [{ data: [p, ab], backgroundColor: ['#27ae60', '#c0392b'] }] }
-        });
-    }
+        presentData.push(p);
+        absentData.push(ab);
+    });
+
+    let ctx = document.getElementById('dailyChart').getContext('2d');
+    if(chartObj) chartObj.destroy();
+
+    chartObj = new Chart(ctx, {
+        type: 'line', // تغيير النوع إلى منحنى بياني
+        data: {
+            labels: allDates,
+            datasets: [
+                {
+                    label: 'حضور',
+                    data: presentData,
+                    borderColor: '#27ae60',
+                    backgroundColor: 'rgba(39, 174, 96, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4, // جعل المنحنى انسيابياً
+                    pointRadius: 3 // حجم نقاط التقاطع
+                },
+                {
+                    label: 'غياب',
+                    data: absentData,
+                    borderColor: '#c0392b',
+                    backgroundColor: 'rgba(192, 57, 43, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointRadius: 3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true, // الحفاظ على التناسب ليبقى صغيراً
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: { font: { size: 10, family: 'Cairo' } } // تصغير حجم خط الأسطورة
+                }
+            },
+            scales: {
+                y: { 
+                    beginAtZero: true, 
+                    ticks: { font: { size: 9 } } 
+                },
+                x: { 
+                    ticks: { font: { size: 9 } } 
+                }
+            }
+        }
+    });
+}
 
     function renderAlerts() {
         let ui = document.getElementById('alertUI'); ui.innerHTML = '';
