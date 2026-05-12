@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <title>نظام إدارة الغيابات الاحترافي - مركز أحمد زبانة</title>
+    <title>   إدارة الغيابات و الحضور</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -44,7 +44,7 @@
     <!-- واجهة الدخول -->
     <div id="loginPanel" class="card" style="max-width: 450px; margin: 50px auto; border-top: 5px solid var(--primary); padding: 30px;">
         <div id="loginView">
-            <h2 style="margin-bottom: 25px;">🔑 دخول الأستاذ</h2>
+            <h2 style="margin-bottom: 25px;">🔑 دخول </h2>
             <label>اسم المستخدم:</label>
             <input type="text" id="userName" placeholder="أدخل اسمك أو admin">
             <label>كلمة السر:</label>
@@ -74,7 +74,7 @@
         <div class="card" style="text-align: center; border-bottom: 3px solid var(--primary);">
             <h3 style="margin: 0;">الجمهورية الجزائرية الديمقراطية الشعبية</h3>
             <h3 style="margin: 5px 0; color: var(--primary);">مركز التكوين و التمهين الشهيد أحمد زبانة السوقر 01</h3>
-            <p style="margin: 5px 0; font-size: 0.9rem; color: #666;">نظام الإدارة الرقمي للغيابات - الأستاذ: <span id="currentProfName"></span></p>
+            <p style="margin: 5px 0; font-size: 0.9rem; color: #666;">من تصميم الأستاذ/دومة الهواري بومدين -أنت الأن مسجل بدخول : <span id="currentProfName"></span></p>
         </div>
         <div class="flex-group">
             <div class="card flex-1">
@@ -91,7 +91,7 @@
                 <div id="traineeUI" class="item-list"></div>
             </div>
             <div class="card flex-1">
-                <h2>📅 تسجيل الحضور (فترتين)</h2>
+                <h2> تسجيل الحضور </h2>
                 <input type="date" id="targetDate" onchange="refreshAll()">
                 <select id="traineeSelect"></select>
                 <hr>
