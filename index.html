@@ -3,7 +3,7 @@
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <title>   إدارة الغيابات و الحضور</title>
+    <title>إدارة الغيابات و الحضور</title>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/docx@7.1.0/build/index.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
@@ -34,14 +34,12 @@
         .item-row { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #eee; }
         .wa-btn { background: #25D366; color: white; padding: 5px 12px; text-decoration: none; border-radius: 5px; font-size: 0.8rem; font-weight: bold; }
         .word-btn { background: var(--word); color: white; padding: 5px 12px; border: none; border-radius: 5px; font-size: 0.8rem; cursor: pointer; }
-        /* زر التعديل الصغير */
         .btn-edit-sm { background: var(--edit); color: white; border: none; border-radius: 5px; cursor: pointer; width: 35px; height: 30px; display: flex; justify-content: center; align-items: center; }
     </style>
 </head>
 <body>
 <div class="container">
 
-    <!-- واجهة الدخول -->
     <div id="loginPanel" class="card" style="max-width: 450px; margin: 50px auto; border-top: 5px solid var(--primary); padding: 30px;">
         <div id="loginView">
             <h2 style="margin-bottom: 25px;">🔑 دخول </h2>
@@ -66,7 +64,6 @@
         </div>
     </div>
 
-    <!-- لوحة التطبيق الرئيسية -->
     <div id="appPanel" style="display:none;">
         <div style="display: flex; justify-content: flex-end; padding: 10px;">
             <button onclick="window.location.reload()" style="width: auto; background: #c0392b; color: white; padding: 8px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">🚪 خروج</button>
@@ -107,10 +104,9 @@
                         <button class="btn-danger" onclick="record('PM', 'غائب')">❌ غائب</button>
                     </div>
                 </div>
-               <!-- تحديد عرض أقصى 300px وتوسيط الرسم -->
-<div id="chartArea" style="margin-top:15px; max-width: 320px; margin: 0 auto;">
-    <canvas id="dailyChart"></canvas>
-</div>
+                <div id="chartArea" style="margin-top:15px; max-width: 320px; margin: 0 auto;">
+                    <canvas id="dailyChart"></canvas>
+                </div>
             </div>
         </div>
 
@@ -169,7 +165,6 @@
 
     function forgotPass() { alert("يرجى مراجعة مصلحة الرقابة العامة لإعادة تعيين كلمة السر."); }
 
-    // --- إدارة التخصصات (تم إضافة التعديل) ---
     function addSpec() {
         let n = document.getElementById('specNameIn').value.trim();
         if(n) { db.specs.push({ id: Date.now(), name: n }); save(); renderSpecs(); document.getElementById('specNameIn').value = ''; }
@@ -202,7 +197,6 @@
 
     function delSpec(id) { if(confirm("حذف التخصص؟")) { db.specs = db.specs.filter(x => x.id != id); save(); renderSpecs(); } }
 
-    // --- إدارة المتربصين (تم إضافة التعديل) ---
     function addTrainee() {
         let n = document.getElementById('traineeNameIn').value.trim(), p = document.getElementById('traineePhoneIn').value.trim(), s = document.getElementById('specFilter').value;
         if(n && s) { db.trainees.push({ id: Date.now(), name: n, phone: p, specId: s }); save(); renderTrainees(); }
@@ -236,7 +230,7 @@
         }
     }
 
-    function delTrainee(id) { if(confirm("حذف المتربص؟")) { db.trainees = db.trainees.filter(x => x.id != id); save(); renderTrainees(); } }
+    function delTrainee(id) { if(confirm("حذف المتربص?")) { db.trainees = db.trainees.filter(x => x.id != id); save(); renderTrainees(); } }
 
     function record(period, status) {
         let tId = document.getElementById('traineeSelect').value, d = document.getElementById('targetDate').value;
@@ -249,70 +243,69 @@
 
     function refreshAll() { updateChart(); renderAlerts(); }
 
-   function updateChart() {
-    // جلب آخر 5 أيام مسجلة للمقارنة بينها
-    let allDates = [...new Set(db.logs.map(l => l.date))].sort().slice(-5);
-    if(allDates.length === 0) allDates = [document.getElementById('targetDate').value];
+    function updateChart() {
+        let allDates = [...new Set(db.logs.map(l => l.date))].sort().slice(-5);
+        if(allDates.length === 0) allDates = [document.getElementById('targetDate').value];
 
-    let presentData = [];
-    let absentData = [];
+        let presentData = [];
+        let absentData = [];
 
-    allDates.forEach(d => {
-        let dayLogs = db.logs.filter(x => x.date === d);
-        let p = 0, ab = 0;
-        dayLogs.forEach(l => {
-            if(l.AM === 'حاضر') p++; if(l.AM === 'غائب') ab++;
-            if(l.PM === 'حاضر') p++; if(l.PM === 'غائب') ab++;
+        allDates.forEach(d => {
+            let dayLogs = db.logs.filter(x => x.date === d);
+            let p = 0, ab = 0;
+            dayLogs.forEach(l => {
+                if(l.AM === 'حاضر') p++; if(l.AM === 'غائب') ab++;
+                if(l.PM === 'حاضر') p++; if(l.PM === 'غائب') ab++;
+            });
+            presentData.push(p);
+            absentData.push(ab);
         });
-        presentData.push(p);
-        absentData.push(ab);
-    });
 
-    let ctx = document.getElementById('dailyChart').getContext('2d');
-    if(chartObj) chartObj.destroy();
+        let ctx = document.getElementById('dailyChart').getContext('2d');
+        if(chartObj) chartObj.destroy();
 
-    chartObj = new Chart(ctx, {
-        type: 'bar', // هذا هو نوع Histogramme (أعمدة)
-        data: {
-            labels: allDates,
-            datasets: [
-                {
-                    label: 'حضور',
-                    data: presentData,
-                    backgroundColor: '#27ae60', // لون أخضر ثابت للأعمدة
-                    borderRadius: 5, // جعل زوايا الأعمدة دائرية قليلاً لشكل عصري
-                    barThickness: 15 // التحكم في عرض العمود ليبقى الرسم صغيراً
-                },
-                {
-                    label: 'غياب',
-                    data: absentData,
-                    backgroundColor: '#c0392b', // لون أحمر ثابت
-                    borderRadius: 5,
-                    barThickness: 15
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: true,
-            plugins: {
-                legend: {
-                    position: 'top',
-                    labels: { font: { size: 10, family: 'Cairo' } }
-                }
+        chartObj = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: allDates,
+                datasets: [
+                    {
+                        label: 'حضور',
+                        data: presentData,
+                        backgroundColor: '#27ae60',
+                        borderRadius: 5,
+                        barThickness: 15
+                    },
+                    {
+                        label: 'غياب',
+                        data: absentData,
+                        backgroundColor: '#c0392b',
+                        borderRadius: 5,
+                        barThickness: 15
+                    }
+                ]
             },
-            scales: {
-                y: { 
-                    beginAtZero: true,
-                    ticks: { stepSize: 1, font: { size: 9 } } 
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: { font: { size: 10, family: 'Cairo' } }
+                    }
                 },
-                x: { 
-                    ticks: { font: { size: 9 } } 
+                scales: {
+                    y: { 
+                        beginAtZero: true,
+                        ticks: { stepSize: 1, font: { size: 9 } } 
+                    },
+                    x: { 
+                        ticks: { font: { size: 9 } } 
+                    }
                 }
             }
-        }
-    });
-}
+        });
+    }
 
     function renderAlerts() {
         let ui = document.getElementById('alertUI'); ui.innerHTML = '';
@@ -354,7 +347,7 @@
                     new Paragraph({ alignment: AlignmentType.CENTER, spacing: { before: 400, after: 400 }, children: [new TextRun({ text: "إشعار بغياب غير نظامي", bold: true, size: 40, underline: {}, rightToLeft: true })] }),
                     new Paragraph({ alignment: AlignmentType.RIGHT, bidirectional: true, children: [new TextRun({ text: "يؤسفنا أن نعلمكم بالغيابات التالية للمتربص(ة): " + t.name, bold: true, size: 30, rightToLeft: true })] }),
                     ...absenceDates.map(d => new Paragraph({ alignment: AlignmentType.RIGHT, bidirectional: true, children: [new TextRun({ text: "• " + d, size: 24, rightToLeft: true })] })),
-                     new Paragraph({ alignment: AlignmentType.RIGHT, spacing: { before: 500 }, children: [new TextRun({ text: " لهذا يرجى منكم إتخاذ الإجراءات القانونية اللازمة.", bold: true, size: 26, rightToLeft: true })] })
+                    new Paragraph({ alignment: AlignmentType.RIGHT, spacing: { before: 500 }, children: [new TextRun({ text: " لهذا يرجى منكم إتخاذ الإجراءات القانونية اللازمة.", bold: true, size: 26, rightToLeft: true })] }),
                     new Paragraph({ alignment: AlignmentType.LEFT, spacing: { before: 500 }, children: [new TextRun({ text: "إمضاء الأستاذ", bold: true, size: 26, rightToLeft: true })] })
                 ]
             }]
